@@ -4,11 +4,11 @@ import React, { useState } from "react";
 
 
 
-export default function LoginForm() {
-
+export default function SignupForm() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [conformPassword, setConformPassword] = useState("");
     const [errors, setErrors] = useState([]);
 
 
@@ -71,6 +71,19 @@ export default function LoginForm() {
                     placeholder="User Password"
                     autoComplete="current-password"
                     aria-label="Password"
+                    className="block w-full rounded-b-md bg-white dark:bg-gray-800 px-3 py-1.5 text-base text-gray-900 dark:text-white outline outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:relative focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  />
+                </div>
+                <div className="-mt-px">
+                  <input
+                    id="conformPassword"
+                    name="conformPassword"
+                    type="conformPassword"
+                    value={conformPassword}
+                    onChange={(e) => setConformPassword(e.target.value)}
+                    required
+                    placeholder="Confirm Password"
+                    aria-label="Conform Password"
                     className="block w-full rounded-b-md bg-white dark:bg-gray-800 px-3 py-1.5 text-base text-gray-900 dark:text-white outline outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:relative focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                   />
                 </div>
