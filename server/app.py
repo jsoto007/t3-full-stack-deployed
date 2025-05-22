@@ -9,7 +9,7 @@ from flask_restful import Api, Resource
 from sqlalchemy.exc import IntegrityError
 
 from config import db, bcrypt, app
-from models import User, Bird, CarInventory, CarPhoto, MasterCarRecord, UserInventory
+from models import User, Bird, CarInventory, CarPhoto, MasterCarRecord, UserInventory, Dealer
 
 # Add this block
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
@@ -34,7 +34,8 @@ class Signup(Resource):
     def post(self):
         json = request.get_json()
         user = User(
-            email = json['username']
+            email = json['username'],
+            dealer_id = json['dealer_id']
         )
         try:
             user.password_hash = json['password']
@@ -139,8 +140,13 @@ class BirdByID(Resource):
 
 class CarInventories(Resource):
     def get(self):
-        cars = [car.to_dict() for car in CarInventory.query.all()]
-        return make_response(jsonify(cars), 200)
+        user_id = session.get('user_id')
+        if not user_id:
+            return {"error": "Unauthorized"}, 401
+
+        user = User.query.get(user_id)
+        cars = CarInventory.query.filter_by(dealer_id=user.dealer_id).all()
+        return make_response(jsonify([car.to_dict() for car in cars]), 200)
 
     def post(self):
         data = request.get_json()
@@ -160,7 +166,8 @@ class CarInventories(Resource):
             year=data.get('year'),
             make=data.get('make'),
             user_id=data['user_id'],
-            user_inventory_id=user_inventory_id
+            user_inventory_id=user_inventory_id,
+            dealer_id=User.query.get(data['user_id']).dealer_id
         )
         db.session.add(new_car)
         db.session.commit()
@@ -210,10 +217,20 @@ class CarPhotos(Resource):
 
 class MasterCarRecords(Resource):
     def get(self):
-        records = [rec.to_dict() for rec in MasterCarRecord.query.order_by(MasterCarRecord.created_at.desc()).all()]
-        return make_response(jsonify(records), 200)
+        user_id = session.get('user_id')
+        if not user_id:
+            return {"error": "Unauthorized"}, 401
+
+        user = User.query.get(user_id)
+        records = MasterCarRecord.query.filter_by(dealer_id=user.dealer_id).order_by(MasterCarRecord.created_at.desc()).all()
+        return make_response(jsonify([rec.to_dict() for rec in records]), 200)
 
     def post(self):
+        user_id = session.get('user_id')
+        if not user_id:
+            return {"error": "Unauthorized"}, 401
+
+        user = User.query.get(user_id)
         data = request.get_json()
         new_record = MasterCarRecord(
             vin_number=data['vin_number'],
@@ -223,7 +240,8 @@ class MasterCarRecords(Resource):
             purchase_price=data.get('purchase_price'),
             selling_price=data.get('selling_price'),
             sold_price=data.get('sold_price'),
-            is_sold=data.get('is_sold', False)
+            is_sold=data.get('is_sold', False),
+            dealer_id=user.dealer_id
         )
         db.session.add(new_record)
         db.session.commit()

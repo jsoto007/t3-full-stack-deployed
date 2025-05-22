@@ -22,6 +22,16 @@ class Bird(db.Model, SerializerMixin):
 
         
 
+class Dealer(db.Model, SerializerMixin):
+    __tablename__ = 'dealers'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True, nullable=False)
+
+    users = relationship('User', backref=backref('dealer', lazy=True))
+    car_inventories = relationship('CarInventory', backref=backref('dealer', lazy=True))
+
+
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
@@ -31,6 +41,8 @@ class User(db.Model, SerializerMixin):
     admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
+
+    dealer_id = db.Column(db.Integer, db.ForeignKey('dealers.id'), nullable=False)
 
 
     @validates("email")
@@ -102,6 +114,8 @@ class CarInventory(db.Model, SerializerMixin):
     user_inventory_id = db.Column(db.Integer, db.ForeignKey('user_inventories.id'), nullable=True)
     user_inventory = relationship('UserInventory', backref=backref('car_inventories', cascade='all, delete-orphan'))
 
+    dealer_id = db.Column(db.Integer, db.ForeignKey('dealers.id'), nullable=False)
+
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
@@ -143,6 +157,7 @@ class MasterCarRecord(db.Model, SerializerMixin):
     vin_number = db.Column(db.String, unique=True, nullable=False)
     location = db.Column(db.String, nullable=True)
     year = db.Column(db.Integer, nullable=True)
+    miles = db.Column(db.Integer, nullable=True)
     make = db.Column(db.String, nullable=True)
     purchase_price = db.Column(db.Float, nullable=True)
     selling_price = db.Column(db.Float, nullable=True)
