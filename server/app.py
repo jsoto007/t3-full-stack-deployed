@@ -66,7 +66,7 @@ class Login(Resource):
         email = request.get_json()['username']
         password = request.get_json()['password']
 
-        user = User.query.filter(User.email == email).first()
+        user = User.query.filter(User.email == email).limit(1).first()
 
         if user and user.authenticate(password):
             session['user_id'] = user.id

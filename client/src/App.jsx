@@ -14,6 +14,8 @@ import MasterCarContainer from './components/MasterCarContainer';
 import AdminInventoryReviewContainer from './components/AdminInventoryReviewContainer';
 import AdminProtectedRoutes from './utils/AdminProtectedRoutes';
 
+import LandingPageContainer from './components/LandingPageContainer';
+
 
 function App() {
   const { currentUser } = useContext(UserContext)
@@ -26,7 +28,7 @@ function App() {
         <Routes>
           <Route path="/auth" element={<Auth />} />
           <Route element={<ProtactedRoutes />}>
-            <Route path="/" element={<CarsContainer />} />
+            <Route path="/" element={<LandingPageContainer />} />
             <Route path="/inventory" element={<UserInventoryContainer />} />
             <Route path="/client_outreach" element={<ClientsContainer />} />
 
